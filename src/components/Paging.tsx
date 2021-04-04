@@ -1,3 +1,4 @@
+import { Pagination } from "@material-ui/lab";
 import React from "react";
 import { useHistory } from "react-router";
 
@@ -11,24 +12,16 @@ export function Paging(props: PagingProps): JSX.Element {
     console.log(history.location);
     return (
         <div>
-            <button
-                disabled={props.offset - props.count < 0}
-                onClick={() =>
+            <Pagination
+                count={Math.ceil(props.totalCount / props.count)}
+                color="primary"
+                page={Math.ceil(props.offset / props.count) + 1}
+                onChange={(event, value) =>
                     history.push(
-                        `${history.location.pathname}?offset=${props.offset - props.count}&count=${props.count}`
+                        `${history.location.pathname}?offset=${(value - 1) * props.count}&count=${props.count}`
                     )
-                }>
-                предыдущая
-            </button>
-            <button
-                disabled={props.offset + props.count >= props.totalCount}
-                onClick={() =>
-                    history.push(
-                        `${history.location.pathname}?offset=${props.offset + props.count}&count=${props.count}`
-                    )
-                }>
-                следующая
-            </button>
+                }
+            />
         </div>
     );
 }

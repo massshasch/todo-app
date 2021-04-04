@@ -1,3 +1,6 @@
+import { Fab, withStyles } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
+import AddIcon from "@material-ui/icons/Add";
 import React from "react";
 
 import { AddTodoModal } from "./components/AddTodoModal";
@@ -12,6 +15,7 @@ export interface TodoItem {
 }
 
 interface TodoAppProps {
+    classes: { fab: string };
     isDone: boolean;
     offset: number;
     count: number;
@@ -26,7 +30,8 @@ interface TodoAppState {
 function filterBySearchValue(item: TodoItem, searchValue: string) {
     return item.title.indexOf(searchValue) > -1 || item.description.indexOf(searchValue) > -1;
 }
-export class TodoApp extends React.Component<TodoAppProps, TodoAppState> {
+
+class TodoAppInternal extends React.Component<TodoAppProps, TodoAppState> {
     public state: TodoAppState = {
         openModal: false,
         todos: [
@@ -67,21 +72,45 @@ export class TodoApp extends React.Component<TodoAppProps, TodoAppState> {
         const filteredTodos = todos
             .map((item, index) => ({ item: item, index: index }))
             .filter(x => x.item.isDone === this.props.isDone && filterBySearchValue(x.item, this.state.valueSearch));
+
         return (
-            <div>
-                <input type="text" value={this.state.valueSearch} onChange={this.handleChangeSearch} />
+            <div style={{ margin: 10 }}>
+                <TextField
+                    size="small"
+                    label="Поиск"
+                    variant="outlined"
+                    value={this.state.valueSearch}
+                    onChange={this.handleChangeSearch}
+                />
 
                 <NavigationTabs
                     isDone={this.props.isDone}
                     todoCount={todos.filter(x => !x.isDone && filterBySearchValue(x, this.state.valueSearch)).length}
                     doneCount={todos.filter(x => x.isDone && filterBySearchValue(x, this.state.valueSearch)).length}
                 />
+
                 {filteredTodos
                     .map(x => (
-                        <TodoCard item={x.item} key={x.index} onDoneClick={() => this.handleDoneClick(x.index)} />
+                        <div
+                            key={x.index}
+                            style={{
+                                maxWidth: 345,
+                                marginBottom: 15,
+                                marginTop: 15,
+                            }}>
+                            <TodoCard item={x.item} onDoneClick={() => this.handleDoneClick(x.index)} />
+                        </div>
                     ))
                     .slice(this.props.offset, this.props.offset + this.props.count)}
-                {!this.props.isDone && <button onClick={this.handleAddClick}>ADD</button>}
+                {!this.props.isDone && (
+                    <Fab
+                        color="primary"
+                        aria-label="add"
+                        className={this.props.classes.fab}
+                        onClick={this.handleAddClick}>
+                        <AddIcon />
+                    </Fab>
+                )}
                 {this.state.openModal && (
                     <AddTodoModal onCancelAdd={this.handleCancelAdd} onAddTodo={this.handleAddTodo} />
                 )}
@@ -108,3 +137,11 @@ export class TodoApp extends React.Component<TodoAppProps, TodoAppState> {
             ],
         });
 }
+
+export const TodoApp = withStyles(theme => ({
+    fab: {
+        position: "fixed",
+        bottom: theme.spacing(2),
+        right: theme.spacing(2),
+    },
+}))(TodoAppInternal);

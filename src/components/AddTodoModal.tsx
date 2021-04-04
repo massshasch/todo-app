@@ -1,3 +1,4 @@
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@material-ui/core";
 import React from "react";
 
 import { TodoItem } from "../TodoApp";
@@ -21,23 +22,42 @@ export class AddTodoModal extends React.Component<AddTodoModalProps, AddTodoModa
 
     public render(): JSX.Element {
         return (
-            <div>
-                <div>
-                    Заголовок:
-                    <input type="text" value={this.state.title} onChange={this.handleChangeTitle} />
-                </div>
+            <Dialog onClose={this.props.onCancelAdd} open>
+                <DialogTitle>Добавить TODO</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Заголовок"
+                        fullWidth
+                        value={this.state.title}
+                        onChange={this.handleChangeTitle}
+                        error={this.state.errorOpen}
+                        helperText={this.state.errorOpen && "Заполните поле"}
+                    />
 
-                {this.state.errorOpen && <div>заполните поле</div>}
+                    <TextField
+                        margin="dense"
+                        label="Детали"
+                        type="text"
+                        fullWidth
+                        multiline
+                        rows={4}
+                        value={this.state.description}
+                        onChange={this.handleChangeDescription}
+                        variant="outlined"
+                    />
+                </DialogContent>
 
-                <div>
-                    Описание:
-                    <input type="text" value={this.state.description} onChange={this.handleChangeDescription} />
-                </div>
-                <div>
-                    <button onClick={this.props.onCancelAdd}>отмена</button>
-                    <button onClick={this.handleAddClick}>отправить</button>
-                </div>
-            </div>
+                <DialogActions>
+                    <Button onClick={this.props.onCancelAdd} color="primary">
+                        отмена
+                    </Button>
+                    <Button onClick={this.handleAddClick} color="primary">
+                        отправить
+                    </Button>
+                </DialogActions>
+            </Dialog>
         );
     }
     private readonly handleChangeTitle = (event: any) => this.setState({ title: event.target.value });
