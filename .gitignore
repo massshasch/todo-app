@@ -5,3 +5,6 @@ yarn-debug.log*
 yarn-error.log*
 coverage
 dist
+.DS_store
+bin
+obj
