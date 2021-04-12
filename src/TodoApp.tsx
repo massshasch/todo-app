@@ -34,38 +34,14 @@ function filterBySearchValue(item: TodoItem, searchValue: string) {
 class TodoAppInternal extends React.Component<TodoAppProps, TodoAppState> {
     public state: TodoAppState = {
         openModal: false,
-        todos: [
-            { title: "blablabla1", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla2", description: "ohno", isDone: false },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "blablabla3", description: "ohno", isDone: true },
-            { title: "lastday", description: "bye", isDone: false },
-        ],
+        todos: [],
         valueSearch: "",
     };
+    public componentDidMount() {
+        this.setState({
+            todos: JSON.parse(localStorage.getItem("todos") || "[]"),
+        });
+    }
 
     public render(): JSX.Element {
         const { todos } = this.state;
@@ -122,13 +98,23 @@ class TodoAppInternal extends React.Component<TodoAppProps, TodoAppState> {
     private readonly handleAddClick = () => this.setState({ openModal: true });
     private readonly handleCancelAdd = () => this.setState({ openModal: false });
     private readonly handleChangeSearch = (event: any) => this.setState({ valueSearch: event.target.value });
-    private readonly handleAddTodo = (item: TodoItem) =>
+    private readonly handleAddTodo = (item: TodoItem) => {
+        localStorage.setItem("todos", JSON.stringify([...this.state.todos, item]));
         this.setState({
             todos: [...this.state.todos, item],
             openModal: false,
         });
+    };
 
-    private readonly handleDoneClick = (index: number) =>
+    private readonly handleDoneClick = (index: number) => {
+        localStorage.setItem(
+            "todos",
+            JSON.stringify([
+                ...this.state.todos.slice(0, index),
+                { ...this.state.todos[index], isDone: true },
+                ...this.state.todos.slice(index + 1),
+            ])
+        );
         this.setState({
             todos: [
                 ...this.state.todos.slice(0, index),
@@ -136,6 +122,7 @@ class TodoAppInternal extends React.Component<TodoAppProps, TodoAppState> {
                 ...this.state.todos.slice(index + 1),
             ],
         });
+    };
 }
 
 export const TodoApp = withStyles(theme => ({
