@@ -1,7 +1,7 @@
 import { Button, Card, CardActions, CardContent, Typography } from "@material-ui/core";
 import React from "react";
 
-import { TodoItem } from "../TodoApp";
+import { TodoItem } from "../api";
 
 interface TodoCardProps {
     item: TodoItem;

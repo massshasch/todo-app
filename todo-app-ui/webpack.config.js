@@ -65,6 +65,9 @@ module.exports = function (env) {
             host: "0.0.0.0",
             port: 8080,
             proxy: {
+                "/web-api/**": {
+                    target: "http://localhost:5000/",
+                },
                 "*": {
                     secure: false,
                     bypass: () => "/public/index.html",

@@ -3,16 +3,11 @@ import TextField from "@material-ui/core/TextField";
 import AddIcon from "@material-ui/icons/Add";
 import React from "react";
 
+import { AddTodoRequest, Api, TodoItem } from "./api";
 import { AddTodoModal } from "./components/AddTodoModal";
 import { NavigationTabs } from "./components/NavigationTabs";
 import { Paging } from "./components/Paging";
 import { TodoCard } from "./components/TodoCard";
-
-export interface TodoItem {
-    title: string;
-    description: string;
-    isDone: boolean;
-}
 
 interface TodoAppProps {
     classes: { fab: string };
@@ -30,24 +25,22 @@ interface TodoAppState {
 function filterBySearchValue(item: TodoItem, searchValue: string) {
     return item.title.indexOf(searchValue) > -1 || item.description.indexOf(searchValue) > -1;
 }
-
 class TodoAppInternal extends React.Component<TodoAppProps, TodoAppState> {
     public state: TodoAppState = {
         openModal: false,
         todos: [],
         valueSearch: "",
     };
-    public componentDidMount() {
-        this.setState({
-            todos: JSON.parse(localStorage.getItem("todos") || "[]"),
-        });
+
+    public async componentDidMount() {
+        this.setState({ todos: await Api.getTodos() });
     }
 
     public render(): JSX.Element {
         const { todos } = this.state;
-        const filteredTodos = todos
-            .map((item, index) => ({ item: item, index: index }))
-            .filter(x => x.item.isDone === this.props.isDone && filterBySearchValue(x.item, this.state.valueSearch));
+        const filteredTodos = todos.filter(
+            x => x.isDone === this.props.isDone && filterBySearchValue(x, this.state.valueSearch)
+        );
 
         return (
             <div style={{ margin: 10 }}>
@@ -68,13 +61,13 @@ class TodoAppInternal extends React.Component<TodoAppProps, TodoAppState> {
                 {filteredTodos
                     .map(x => (
                         <div
-                            key={x.index}
+                            key={x.id}
                             style={{
                                 maxWidth: 345,
                                 marginBottom: 15,
                                 marginTop: 15,
                             }}>
-                            <TodoCard item={x.item} onDoneClick={() => this.handleDoneClick(x.index)} />
+                            <TodoCard item={x} onDoneClick={() => this.handleDoneClick(x)} />
                         </div>
                     ))
                     .slice(this.props.offset, this.props.offset + this.props.count)}
@@ -98,29 +91,18 @@ class TodoAppInternal extends React.Component<TodoAppProps, TodoAppState> {
     private readonly handleAddClick = () => this.setState({ openModal: true });
     private readonly handleCancelAdd = () => this.setState({ openModal: false });
     private readonly handleChangeSearch = (event: any) => this.setState({ valueSearch: event.target.value });
-    private readonly handleAddTodo = (item: TodoItem) => {
-        localStorage.setItem("todos", JSON.stringify([...this.state.todos, item]));
+    private readonly handleAddTodo = async (item: AddTodoRequest) => {
+        const newTodo = await Api.addTodo(item);
         this.setState({
-            todos: [...this.state.todos, item],
+            todos: [...this.state.todos, newTodo],
             openModal: false,
         });
     };
 
-    private readonly handleDoneClick = (index: number) => {
-        localStorage.setItem(
-            "todos",
-            JSON.stringify([
-                ...this.state.todos.slice(0, index),
-                { ...this.state.todos[index], isDone: true },
-                ...this.state.todos.slice(index + 1),
-            ])
-        );
+    private readonly handleDoneClick = async (item: TodoItem) => {
+        await Api.moveToDone(item.id);
         this.setState({
-            todos: [
-                ...this.state.todos.slice(0, index),
-                { ...this.state.todos[index], isDone: true },
-                ...this.state.todos.slice(index + 1),
-            ],
+            todos: [...this.state.todos.filter(x => x.id !== item.id), { ...item, isDone: true }],
         });
     };
 }

@@ -1,11 +1,11 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@material-ui/core";
 import React from "react";
 
-import { TodoItem } from "../TodoApp";
+import { AddTodoRequest } from "../api";
 
 interface AddTodoModalProps {
     onCancelAdd: () => void;
-    onAddTodo: (item: TodoItem) => void;
+    onAddTodo: (item: AddTodoRequest) => void;
 }
 
 interface AddTodoModalState {
@@ -67,12 +67,9 @@ export class AddTodoModal extends React.Component<AddTodoModalProps, AddTodoModa
             this.props.onAddTodo({
                 title: this.state.title,
                 description: this.state.description,
-                isDone: false,
             });
         } else {
             this.setState({ errorOpen: true });
         }
     };
-
-
 }
