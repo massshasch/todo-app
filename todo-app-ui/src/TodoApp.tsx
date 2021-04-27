@@ -1,4 +1,5 @@
 import { Fab, withStyles } from "@material-ui/core";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import TextField from "@material-ui/core/TextField";
 import AddIcon from "@material-ui/icons/Add";
 import React from "react";
@@ -20,6 +21,7 @@ interface TodoAppState {
     openModal: boolean;
     todos: TodoItem[];
     valueSearch: string;
+    isLoading: boolean;
 }
 
 function filterBySearchValue(item: TodoItem, searchValue: string) {
@@ -30,10 +32,19 @@ class TodoAppInternal extends React.Component<TodoAppProps, TodoAppState> {
         openModal: false,
         todos: [],
         valueSearch: "",
+        isLoading: false,
     };
 
     public async componentDidMount() {
-        this.setState({ todos: await Api.getTodos() });
+        this.setState({ isLoading: true });
+        try {
+            const todos = await Api.getTodos();
+            this.setState({ todos: todos });
+        } catch (e) {
+            alert(e);
+        } finally {
+            this.setState({ isLoading: false });
+        }
     }
 
     public render(): JSX.Element {
@@ -58,6 +69,7 @@ class TodoAppInternal extends React.Component<TodoAppProps, TodoAppState> {
                     doneCount={todos.filter(x => x.isDone && filterBySearchValue(x, this.state.valueSearch)).length}
                 />
 
+                {this.state.isLoading && <CircularProgress disableShrink />}
                 {filteredTodos
                     .map(x => (
                         <div

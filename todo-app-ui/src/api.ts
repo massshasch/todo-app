@@ -13,6 +13,7 @@ export interface AddTodoRequest {
 
 export class Api {
     public static async getTodos(): Promise<TodoItem[]> {
+
         const response = await fetch("/web-api/todos");
         return response.json();
     }
