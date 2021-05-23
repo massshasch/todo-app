@@ -1,0 +1,7 @@
+.appBar {
+    flex-direction: row !important;
+}
+
+.grow {
+    flex: 1 1 auto;
+}

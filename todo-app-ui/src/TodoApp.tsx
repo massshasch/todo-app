@@ -1,6 +1,5 @@
 import { Fab, withStyles } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import TextField from "@material-ui/core/TextField";
 import AddIcon from "@material-ui/icons/Add";
 import React from "react";
 
@@ -55,20 +54,13 @@ class TodoAppInternal extends React.Component<TodoAppProps, TodoAppState> {
 
         return (
             <div style={{ margin: 10 }}>
-                <TextField
-                    size="small"
-                    label="Поиск"
-                    variant="outlined"
-                    value={this.state.valueSearch}
-                    onChange={this.handleChangeSearch}
-                />
-
                 <NavigationTabs
                     isDone={this.props.isDone}
                     todoCount={todos.filter(x => !x.isDone && filterBySearchValue(x, this.state.valueSearch)).length}
                     doneCount={todos.filter(x => x.isDone && filterBySearchValue(x, this.state.valueSearch)).length}
+                    valueSearch={this.state.valueSearch}
+                    onChangeSearch={this.handleChangeSearch}
                 />
-
                 {this.state.isLoading && <CircularProgress disableShrink />}
                 {filteredTodos
                     .map(x => (
@@ -102,7 +94,7 @@ class TodoAppInternal extends React.Component<TodoAppProps, TodoAppState> {
 
     private readonly handleAddClick = () => this.setState({ openModal: true });
     private readonly handleCancelAdd = () => this.setState({ openModal: false });
-    private readonly handleChangeSearch = (event: any) => this.setState({ valueSearch: event.target.value });
+    private readonly handleChangeSearch = (value: string) => this.setState({ valueSearch: value });
     private readonly handleAddTodo = async (item: AddTodoRequest) => {
         const newTodo = await Api.addTodo(item);
         this.setState({

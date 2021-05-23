@@ -10,6 +10,7 @@ interface TodoCardProps {
     item: TodoItem;
     onDoneClick: () => void;
 }
+
 const useStyles = makeStyles({
     root: {
         "&:hover": {
@@ -29,10 +30,6 @@ const useStyles = makeStyles({
         },
         "input:hover ~ &": {
             backgroundColor: "#ebf1f5",
-        },
-        "input:disabled ~ &": {
-            boxShadow: "none",
-            background: "rgba(206,217,224,.5)",
         },
     },
     checkedIcon: {
@@ -55,7 +52,6 @@ const useStyles = makeStyles({
 });
 function StyledCheckbox(props: any) {
     const classes = useStyles();
-
     return (
         <Checkbox
             className={classes.root}
@@ -69,26 +65,32 @@ function StyledCheckbox(props: any) {
     );
 }
 export function TodoCard(props: TodoCardProps): JSX.Element {
+    function handleChange(event: any) {
+        // eslint-disable-next-line react/no-direct-mutation-state
+        sdod(event.target.checked);
+    }
+
     const checkbox = props.item.description.split("\n").map(str => {
         if (str.indexOf("* [x]") > -1) {
             return (
                 <div>
                     {" "}
-                    <StyledCheckbox defaultChecked /> {str.replace(/.{1,5}/, " ")}{" "}
+                    <StyledCheckbox checked={true} onChange={handleChange} />
+                    {str.replace(/.{1,5}/, " ")}{" "}
                 </div>
             );
         } else if (str.indexOf("* [ ]") > -1) {
             return (
                 <div>
                     {" "}
-                    <StyledCheckbox /> {str.replace(/.{1,5}/, " ")}{" "}
+                    {<StyledCheckbox onChange={handleChange} />}
+                    {str.replace(/.{1,5}/, " ")}{" "}
                 </div>
             );
         }
         // eslint-disable-next-line react/jsx-key
         return <div> {str}</div>;
     });
-
     return (
         <Card>
             <CardContent>
